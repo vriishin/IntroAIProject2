@@ -1,3 +1,6 @@
+import random
+
+
 class Node:
     def __init__(self, agent, target, pos):
         self.agent = agent
@@ -36,6 +39,35 @@ class CircularLinkedList:
             current = current.next
             if current == self.head:
                 break
+    
+    def random_edges(self, num_edges):
+        if num_edges <= 0:
+            return
+
+        num_nodes = len(self.node_list)
+        if num_nodes <= 1:
+            return
+
+        edges_added = 0
+        while edges_added < num_edges:
+            node1 = random.choice(self.node_list)
+            node2 = random.choice(self.node_list)
+
+
+            if node1 != node2 and not self.are_connected(node1, node2):
+                node1.next = node2
+                node2.prev = node1
+                edges_added += 1
+
+    def if_connected(self, n1, n2):
+        cur = n1
+        while True:
+            if cur.next == n2:
+                return True
+            cur = cur.next
+            if cur == n1:
+                break
+        return False
 
 
 if __name__ == "__main__":
