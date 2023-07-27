@@ -2,12 +2,6 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 import pickle
-
-class Node:
-    def __init__(self, value):
-        self.val = value
-        self.next = None
-
 class Graph:
     def __init__(self, N_NODES, N_EDGES):
         self.G = nx.cycle_graph(N_NODES)
@@ -16,6 +10,11 @@ class Graph:
             if self.G.degree[n1] < 3 and self.G.degree[n2] < 3 and not self.G.has_edge(n1, n2):
                 self.G.add_edge(n1, n2)
         self.convert_to_dict()
+        self.set_target_location()
+    
+    def set_target_location(self):
+        location = int(random.random(0, 40))
+        self.target = location
 
     def convert_to_dict(self):
         graph_dict = nx.to_dict_of_lists(self.G)
@@ -27,6 +26,14 @@ class Graph:
     
     def print_graph_dict(self):
         print(self.graph_dict)
+    
+    def move_target(self):
+        connections = self.graph_dict[self.target]
+        random_choice = int(random.random(0, len(connections)))
+        self.target = connections[random_choice]
+
+    
+
 
 
 if __name__ == "__main__":
