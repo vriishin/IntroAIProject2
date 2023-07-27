@@ -41,6 +41,8 @@ Agents Implementation
 6: Combination of 4 and Djikstra's (end goal as the state with highest probability)
 7: Improvement on 6?
 
+NOTE: In order to get right data, Agents 1 and 2 spawn together, Agents 4 and 5 spawn together, and Agents 6 and 7 spawn together
+
 Pickle for data persistence of random CLL environments
 Record agent(what timestep is the target acquired) success in array 
 
@@ -49,16 +51,17 @@ while loop (status of any agent has not found target)
     Update status of agent
 
 
-Work Distribution:
-    0. Planning -- Harsh, Reuben
-    1. Environment Setup -- Vrishin, Reuben
-    2. Agent Implementation
-        a. 0 -- 2 Harsh, Reuben
-        b. 3 -- 4 Harsh, Reuben
-        c. 5 -- 7 Vrishin
-    3. Report
-        a. Gray boxes -- Reuben
-        b. Modeling and updating belief state mechanism (with probability) -- Harsh, Reuben, Vrishin
-        c. Implementation details of agents -- We write up our own implementation of agents
-        d. Data performance (Running and analyzing tests on a lot of random envs) -- Harsh, Reuben
-        e. Reflection/Concluding Questions -- Vrishin
+## Work Distribution:
+1. Planning -- Harsh, Reuben
+2. Environment Setup -- Vrishin, Reuben
+3. Agent Implementation
+    a. 0 -- 2 Harsh, Reuben
+    b. 3 -- 4 Harsh, Reuben
+    c. 5 -- 7 Vrishin
+
+4. Report
+    - Gray boxes -- Reuben
+    - Modeling and updating belief state mechanism (with probability) -- Harsh, Reuben, Vrishin
+    - Implementation details of agents -- We write up our own implementation of agents
+    - Data performance (Running and analyzing tests on a lot of random envs) -- Harsh, Reuben
+    - Reflection/Concluding Questions -- Vrishin
