@@ -8,84 +8,42 @@ class Node:
         self.val = value
         self.next = None
 
-class CircularLinkedList:
-    def __init__(self, nodes = None):
-        self.head = None
-        if nodes is not None:
-            node = Node(value=nodes.pop(0))
-            self.head = node
-            while len(nodes) != 0:
-                node.next = Node(value=nodes.pop(0))
-                node = node.next
-            node.next = self.head
+class Graph:
+    def __init__(self, N_NODES, N_EDGES):
+        self.G = nx.cycle_graph(N_NODES)
+        while nx.number_of_edges(self.G) < N_NODES + N_EDGES:
+            n1, n2 = random.sample(range(N_NODES), 2)
+            if self.G.degree[n1] < 3 and self.G.degree[n2] < 3 and not self.G.has_edge(n1, n2):
+                self.G.add_edge(n1, n2)
+        self.convert_to_dict()
 
-    def __iter__(self):
-        node = self.head
-        while node is not None:
-            yield node
-            node = node.next
-            if node == self.head:
-                break
+    def convert_to_dict(self):
+        graph_dict = nx.to_dict_of_lists(self.G)
+        self.graph_dict = graph_dict
+    
+    def draw_graph(self):
+        nx.draw_circular(self.G, with_labels=True)
+        plt.show()
+    
+    def print_graph_dict(self):
+        print(self.graph_dict)
 
-    def add_after(self, target_node_data, new_node):
-        if not self.head:
-            raise Exception("List is empty")
-
-        for node in self:
-            if node.val == target_node_data:
-                new_node.next = node.next
-                node.next = new_node
-                return
-
-        raise Exception("Node with data '%s' not found" % target_node_data)
-
-def create_graph(N_NODES, N_EDGES):
-    G = nx.cycle_graph(N_NODES)
-    while nx.number_of_edges(G) < N_NODES + N_EDGES:
-        n1, n2 = random.sample(range(N_NODES), 2)
-        if G.degree[n1] < 3 and G.degree[n2] < 3 and not G.has_edge(n1, n2):
-            G.add_edge(n1, n2)
-    return G
-
-def convert_to_dict(G):
-    graph_dict = nx.to_dict_of_lists(G)
-    return graph_dict
-
-def build_linked_list(graph_dict):
-    circular_linked_lists = {}
-    for node, edges in graph_dict.items():
-        circular_linked_lists[node] = CircularLinkedList(edges)
-    return circular_linked_lists
-
-def draw_graph(G):
-    nx.draw_circular(G, with_labels=True)
-    plt.show()
-
-def print_graph_dict(graph_dict):
-    print("Graph as a dictionary:")
-    for node, edges in graph_dict.items():
-        print(f"Node {node} connected to: {edges}")
-
-def print_linked_list(circular_linked_lists):
-    print("\nGraph as a circular linked list:")
-    for node, linked_list in circular_linked_lists.items():
-        print(f"Node {node} connected to: ", end="")
-        for connected_node in linked_list:
-            print(connected_node.val, end=" ")
-        print()
 
 if __name__ == "__main__":
     # Generate 50 graphs and save them using pickle.
-    graphs = [create_graph(40, 10) for _ in range(50)]
+    graph_envs = []
+    for i in range(0, 40):
+        graph_env = Graph(40, 10)
+        graph_envs.append(graph_env)
+    # graphs = [create_graph(40, 10) for _ in range(10)]
     with open('graphs.pkl', 'wb') as f:
-        pickle.dump(graphs, f)
+        pickle.dump(graph_envs, f)
 
     # Load the 7th graph (index 6) from the pickle file.
     with open('graphs.pkl', 'rb') as f:
-        loaded_graphs = pickle.load(f)
-    G = loaded_graphs[6]
+        loaded_graphs_envs = pickle.load(f)
+    example = loaded_graphs_envs[6]
+    example.print_graph_dict()
+    example.draw_graph()
     
-    # Use the loaded graph
-    graph_dict = convert_to_dict(G)
-    circular_linked_lists = build_linked_list(graph_dict)
-    draw_graph(G)
+    
