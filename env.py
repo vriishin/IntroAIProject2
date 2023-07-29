@@ -134,11 +134,48 @@ class Agent_4(Agent):
             #print(f"Node {node}: {prob}")
 
 class Agent_5(Agent):
-    def __init__(self):
+    def __init__(self, graph_dict):
+        total_nodes = 40
         self.location = random.randint(0, 39)
+        self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
+        self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
+    
+    def modified_probabilistic_kb(self, examined_node, graph_dict, target):
+        target_found = True if examined_node == target else False
+        if target_found:
+            self.probabilistic_kb[examined_node] = 1
+        else:
+            self.probabilistic_kb[examined_node] = 0
+
+        for node in graph_dict:
+            if self.num_neighbors[node] > 0:
+                k = self.num_neighbors[node]
+                p_move_to_neighbor = 1 / k
+                for neighbor in graph_dict[node]:
+                    self.probabilistic_kb[neighbor] += p_move_to_neighbor
+                    if self.num_neighbors[neighbor] > 0:
+                        k_neighbor = self.num_neighbors[neighbor]
+                        p_move_to_next_neighbor = p_move_to_neighbor / k_neighbor
+                        for neighbor_neighbor in graph_dict[neighbor]:
+                            self.probabilistic_kb[neighbor_neighbor] += p_move_to_next_neighbor
+                    self.probabilistic_kb[node] -= 1
+
+        # Normalize the probabilities to maintain the sum equal to 1.
+        total_probability = sum(self.probabilistic_kb.values())
+        for node in self.probabilistic_kb:
+            self.probabilistic_kb[node] /= total_probability
 
     def move_agent(self, graph_dict, target):
         pass
+        highest_prob_nodes = [node for node, prob in self.probabilistic_kb.items() if prob == max(self.probabilistic_kb.values())]
+        next_location = random.choice(highest_prob_nodes)
+        self.modified_probabilistic_kb(next_location, graph_dict, target)
+        self.location = next_location
+        print(f"AGENT 5 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print("Knowledge Base:")
+        # for node, prob in self.probabilistic_kb.items():
+        #     print(f"Node {node}: {prob}")
+
 
 class Agent_6(Agent):
     def __init__(self, graph_dict):
