@@ -57,11 +57,12 @@ while loop (status of any agent has not found target)
 3. Agent Implementation
     a. 0 -- 2 Harsh, Reuben
     b. 3 -- 4 Harsh, Reuben
-    c. 5 -- 7 Vrishin
+    c. 5 Vrishin
+    d. 6 -- 7 Harsh, Reuben
 
 
 4. Report
-    - Gray boxes -- Reuben
+    - Gray boxes -- Vrishin
     - Modeling and updating belief state mechanism (with probability) -- Harsh, Reuben, Vrishin
     - Implementation details of agents -- We write up our own implementation of agents
     - Data performance (Running and analyzing tests on a lot of random envs) -- Reuben
