@@ -231,6 +231,7 @@ class Agent_7(Agent):
         #     print(f"Node {node}: {prob}")
 
 class Graph:
+
     def __init__(self, N_NODES, N_EDGES):
         self.G = nx.cycle_graph(N_NODES)
         while nx.number_of_edges(self.G) < N_NODES + N_EDGES:
@@ -305,7 +306,6 @@ class Graph:
         return self.agent_performance
     
 def calculate_averages(performance_records):
-    # Using zip to group the performance of each agent
     transposed_records = list(map(list, zip(*performance_records)))
     
     averages = []
@@ -316,10 +316,9 @@ def calculate_averages(performance_records):
     return averages
 
 if __name__ == "__main__":
-    # Load the saved graphs
+
     with open('graphs.pkl', 'rb') as f:
         graph_envs = pickle.load(f)
-        
     # For each graph, initialize the agents and run them
     performance_records = []
     for i, graph_env in enumerate(graph_envs):
@@ -327,4 +326,8 @@ if __name__ == "__main__":
         graph_env.run_agents()
         performance_records.append(graph_env.get_performance())
     
-    calculate_averages(performance_records)
+    perf_avgs = calculate_averages(performance_records)
+
+    with open('performance.pkl', 'wb') as f:
+        pickle.dump(perf_avgs, f)
+   
