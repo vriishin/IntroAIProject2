@@ -64,7 +64,7 @@ class Agent_0(Agent):
         self.location = random.randint(0, 39)
     
     def move_agent(self, graph_dict, target):
-        print(f"AGENT 0 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 0 LOC: {self.location},\n TARGET LOCATION: {target}")
         return self.location
         
     
@@ -81,7 +81,7 @@ class Agent_1(Agent):
             return
 
         self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
-        print(f"AGENT 1 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 1 LOC: {self.location},\n TARGET LOCATION: {target}")
 
 class Agent_2(Agent):
     def __init__(self):
@@ -105,7 +105,7 @@ class Agent_2(Agent):
             return
         selected_path = sorted_paths[0]
         self.location = selected_path[1] if len(selected_path) > 1 else selected_path[0]
-        print(f"AGENT 2 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 2 LOC: {self.location},\n TARGET LOCATION: {target}")
         return
 
 class Agent_3(Agent):
@@ -113,7 +113,7 @@ class Agent_3(Agent):
         self.location = random.randint(0, 39)
 
     def move_agent(self, graph_dict, target):
-        print(f"AGENT 3 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 3 LOC: {self.location},\n TARGET LOCATION: {target}")
         return self.location
     
 class Agent_4(Agent):
@@ -131,7 +131,7 @@ class Agent_4(Agent):
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
         #print("Knowledge Base:")
         #for node, prob in self.probabilistic_kb.items():
             #print(f"Node {node}: {prob}")
@@ -174,7 +174,7 @@ class Agent_5(Agent):
         next_location = random.choice(highest_prob_nodes)
         self.modified_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        print(f"AGENT 5 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 5 LOC: {self.location},\n TARGET LOCATION: {target}")
         # print("Knowledge Base:")
         # for node, prob in self.probabilistic_kb.items():
         #     print(f"Node {node}: {prob}")
@@ -199,7 +199,7 @@ class Agent_6(Agent):
             return
 
         self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
-        print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
         #print("Knowledge Base:")
         #for node, prob in self.probabilistic_kb.items():
             #print(f"Node {node}: {prob}")
@@ -225,7 +225,7 @@ class Agent_7(Agent):
             print("You have made a grave error...")
             return
 
-        print(f"AGENT 7 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print(f"AGENT 7 LOC: {self.location},\n TARGET LOCATION: {target}")
         # print("Knowledge Base:")
         # for node, prob in self.probabilistic_kb.items():
         #     print(f"Node {node}: {prob}")
@@ -247,7 +247,7 @@ class Graph:
             self.turn()
             self.move_target()
             # print(self.time_step)
-        print(self.agent_performance)
+        # print(self.agent_performance)
 
     def turn(self):
         self.time_step += 1
@@ -263,8 +263,8 @@ class Graph:
         if(agent_location == self.target):
             self.agent_performance[agent_index] = self.time_step
             self.agents_active[agent_index] = False
-            print(f"Agent {agent_index} has captured the target")
-            print(self.agent_performance)
+            # print(f"Agent {agent_index} has captured the target")
+            # print(self.agent_performance)
 
     def initialize_agents(self):        
         self.agents = [Agent_0(), Agent_1(), Agent_2(), Agent_3(), Agent_4(self.graph_dict), Agent_5(self.graph_dict), Agent_6(self.graph_dict), Agent_7(self.graph_dict)]
@@ -301,24 +301,30 @@ class Graph:
         connections = self.graph_dict[self.target]
         random_choice = random.randint(0, len(connections)-1)
         self.target = connections[random_choice]
-
+    def get_performance(self):
+        return self.agent_performance
+    
+def calculate_averages(performance_records):
+    # Using zip to group the performance of each agent
+    transposed_records = list(map(list, zip(*performance_records)))
+    
+    averages = []
+    for i, record in enumerate(transposed_records):
+        avg = sum(record) / len(record)
+        print(f"Agent {i} Performance: {avg}")
+        averages.append(avg)
+    return averages
 
 if __name__ == "__main__":
-    # Generate 50 graphs and save them using pickle.
-    graph_envs = []
-    for i in range(0, 40):
-        graph_env = Graph(40, 10)
-        graph_envs.append(graph_env)
-    # graphs = [create_graph(40, 10) for _ in range(10)]
-    with open('graphs.pkl', 'wb') as f:
-        pickle.dump(graph_envs, f)
-
-    # Load the 7th graph (index 6) from the pickle file.
+    # Load the saved graphs
     with open('graphs.pkl', 'rb') as f:
-        loaded_graphs_envs = pickle.load(f)
-    example = loaded_graphs_envs[6]
-    example.print_graph_dict()
-    # example.draw_graph()
-    example.run_agents()
+        graph_envs = pickle.load(f)
+        
+    # For each graph, initialize the agents and run them
+    performance_records = []
+    for i, graph_env in enumerate(graph_envs):
+        graph_env.initialize_agents()
+        graph_env.run_agents()
+        performance_records.append(graph_env.get_performance())
     
-    
+    calculate_averages(performance_records)
