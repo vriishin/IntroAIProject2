@@ -59,6 +59,7 @@ while loop (status of any agent has not found target)
     b. 3 -- 4 Harsh, Reuben
     c. 5 -- 7 Vrishin
 
+
 4. Report
     - Gray boxes -- Reuben
     - Modeling and updating belief state mechanism (with probability) -- Harsh, Reuben, Vrishin

@@ -144,10 +144,10 @@ class Agent_4:
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        print(f"AGENT LOC: {self.location},\n TARGET LOCATION: {target}")
-        print("Knowledge Base:")
-        for node, prob in self.probabilistic_kb.items():
-            print(f"Node {node}: {prob}")
+        print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
+        # print("Knowledge Base:")
+        # for node, prob in self.probabilistic_kb.items():
+        #     print(f"Node {node}: {prob}")
 
 class Agent_5:
     def __init__(self):
@@ -192,16 +192,12 @@ class Agent_6:
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
         shortest_path = self.dijkstra(graph_dict, self.location, next_location)
-
-        # If there are no paths (agent and target are in disconnected subgraphs), don't move.
         if not shortest_path:
             print("You have made a grave error...")
             return
 
-        # Moves agent 1 step on the shortest path
         self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
-        # self.location = next_location
-        print(f"AGENT LOC: {self.location},\n TARGET LOCATION: {target}")
+        print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
         print("Knowledge Base:")
         for node, prob in self.probabilistic_kb.items():
             print(f"Node {node}: {prob}")
@@ -268,8 +264,8 @@ class Graph:
                 self.agents[i].move_agent(self.graph_dict, self.target)
                 self.agent_locations[i] = self.agents[i].location
                 self.is_target_captured(self.agent_locations[i], i)
-        # self.draw_graph() # draw the graph at each time step
-        # plt.pause(0.1) # add a pause so you can see the graphs
+        self.draw_graph() # draw the graph at each time step
+        plt.pause(0.1) # add a pause so you can see the graphs
 
     def is_target_captured(self, agent_location, agent_index):
         if(agent_location == self.target):
