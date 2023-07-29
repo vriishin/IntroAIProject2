@@ -63,7 +63,7 @@ while loop (status of any agent has not found target)
 
 4. Report
     - Gray boxes -- Vrishin
-    - Modeling and updating belief state mechanism (with probability) -- Harsh, Reuben, Vrishin
+    - Modeling and updating belief state mechanism (with probability) -- Reuben, Vrishin
     - Implementation details of agents -- We write up our own implementation of agents
     - Data performance (Running and analyzing tests on a lot of random envs) -- Reuben
     - Reflection/Concluding Questions -- Vrishin

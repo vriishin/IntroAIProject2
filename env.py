@@ -64,7 +64,9 @@ class Agent_0(Agent):
         self.location = random.randint(0, 39)
     
     def move_agent(self, graph_dict, target):
+        print(f"AGENT 0 LOC: {self.location},\n TARGET LOCATION: {target}")
         return self.location
+        
     
 
 class Agent_1(Agent):
@@ -74,14 +76,12 @@ class Agent_1(Agent):
  
     def move_agent(self, graph_dict, target):
         shortest_path = self.djikstra(graph_dict, self.location, target)
-
-        # If there are no paths (agent and target are in disconnected subgraphs), don't move.
         if not shortest_path:
             print("You have made a grave error...")
             return
 
-        # Moves agent 1 step on the shortest path
         self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
+        print(f"AGENT 1 LOC: {self.location},\n TARGET LOCATION: {target}")
 
 class Agent_2(Agent):
     def __init__(self):
@@ -105,6 +105,7 @@ class Agent_2(Agent):
             return
         selected_path = sorted_paths[0]
         self.location = selected_path[1] if len(selected_path) > 1 else selected_path[0]
+        print(f"AGENT 2 LOC: {self.location},\n TARGET LOCATION: {target}")
         return
 
 class Agent_3(Agent):
@@ -112,12 +113,14 @@ class Agent_3(Agent):
         self.location = random.randint(0, 39)
 
     def move_agent(self, graph_dict, target):
+        print(f"AGENT 3 LOC: {self.location},\n TARGET LOCATION: {target}")
         return self.location
     
 class Agent_4(Agent):
     def __init__(self, graph_dict):
         total_nodes = 40
         self.location = random.randint(0, 39)
+        # self.location = 0   
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
 
@@ -128,7 +131,7 @@ class Agent_4(Agent):
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        #print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
+        print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
         #print("Knowledge Base:")
         #for node, prob in self.probabilistic_kb.items():
             #print(f"Node {node}: {prob}")
@@ -137,6 +140,7 @@ class Agent_5(Agent):
     def __init__(self, graph_dict):
         total_nodes = 40
         self.location = random.randint(0, 39)
+        # self.location = 0   
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
     
@@ -160,7 +164,6 @@ class Agent_5(Agent):
                             self.probabilistic_kb[neighbor_neighbor] += p_move_to_next_neighbor
                     self.probabilistic_kb[node] -= 1
 
-        # Normalize the probabilities to maintain the sum equal to 1.
         total_probability = sum(self.probabilistic_kb.values())
         for node in self.probabilistic_kb:
             self.probabilistic_kb[node] /= total_probability
@@ -179,9 +182,9 @@ class Agent_5(Agent):
 
 class Agent_6(Agent):
     def __init__(self, graph_dict):
-        # self.location = random.randint(0, 39)
-        total_nodes = 40
         self.location = random.randint(0, 39)
+        total_nodes = 40
+        # self.location = 0        
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
     def move_agent(self, graph_dict, target):
@@ -196,7 +199,7 @@ class Agent_6(Agent):
             return
 
         self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
-        #print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
+        print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
         #print("Knowledge Base:")
         #for node, prob in self.probabilistic_kb.items():
             #print(f"Node {node}: {prob}")
@@ -206,23 +209,15 @@ class Agent_7(Agent):
     def __init__(self, graph_dict):
         total_nodes = 40
         self.location = random.randint(0, 39)
+        # self.location = 0
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
 
     def move_agent(self, graph_dict, target):
-        # Get the neighboring nodes
-        neighbors = graph_dict[self.location]
-        
-        # Calculate probabilities of the neighboring nodes
-        neighbors_probs = {neighbor: self.probabilistic_kb[neighbor] for neighbor in neighbors}
-        
-        # Select the neighboring node with the highest probability
-        highest_prob_neighbors = [node for node, prob in neighbors_probs.items() if prob == max(neighbors_probs.values())]
-        
-        next_location = random.choice(highest_prob_neighbors)
+        highest_prob_nodes = [node for node, prob in self.probabilistic_kb.items() if prob == max(self.probabilistic_kb.values())]
+        highest_prob_sorted = sorted(highest_prob_nodes, key=lambda x: len(self.djikstra(graph_dict, self.location, x)))
+        next_location = highest_prob_sorted[0] if highest_prob_sorted is not None and len(highest_prob_sorted) > 0 else self.location
         self.update_probabilistic_kb(next_location, graph_dict, target)
-        
-        # Update agent's location to the next location
         self.location = next_location
         
         shortest_path = self.djikstra(graph_dict, self.location, next_location)
@@ -231,9 +226,9 @@ class Agent_7(Agent):
             return
 
         print(f"AGENT 7 LOC: {self.location},\n TARGET LOCATION: {target}")
-        print("Knowledge Base:")
-        for node, prob in self.probabilistic_kb.items():
-            print(f"Node {node}: {prob}")
+        # print("Knowledge Base:")
+        # for node, prob in self.probabilistic_kb.items():
+        #     print(f"Node {node}: {prob}")
 
 class Graph:
     def __init__(self, N_NODES, N_EDGES):
@@ -251,15 +246,13 @@ class Graph:
         while not all (not element for element in self.agents_active):
             self.turn()
             self.move_target()
-            print(self.time_step)
+            # print(self.time_step)
         print(self.agent_performance)
 
     def turn(self):
         self.time_step += 1
         for i in range(0, 8):
             if self.agents_active[i]:
-                # if self.is_target_captured(self.agent_locations[i], i):
-                #     continue
                 self.agents[i].move_agent(self.graph_dict, self.target)
                 self.agent_locations[i] = self.agents[i].location
                 self.is_target_captured(self.agent_locations[i], i)
@@ -272,17 +265,14 @@ class Graph:
             self.agents_active[agent_index] = False
             print(f"Agent {agent_index} has captured the target")
             print(self.agent_performance)
-        #     return True
-        # return False
 
     def initialize_agents(self):        
-        self.agents = [Agent_0(), Agent_1(), Agent_2(), Agent_3(), Agent_4(self.graph_dict), Agent_5(), Agent_6(self.graph_dict), Agent_7(self.graph_dict)]
+        self.agents = [Agent_0(), Agent_1(), Agent_2(), Agent_3(), Agent_4(self.graph_dict), Agent_5(self.graph_dict), Agent_6(self.graph_dict), Agent_7(self.graph_dict)]
         self.agent_locations = [self.agents[i].location for i in range(0, 8)]
-        # self.agents_active = [True for i in range(0, 8)]
-        self.agents_active = [False, False, False, False, False, False, False, True]
+        self.agents_active = [True, True, True, True, True, True, True, True]
         self.agents_colors = ["magenta","green","pink","yellow","gray","white","cyan","purple"]
         self.agent_performance = [-1 for i in range(0, 8)]
-        for i in range(0, 7):
+        for i in range(0, 8):
             if self.agents_active[i]:
                 self.is_target_captured(self.agent_locations[i], i)
 
