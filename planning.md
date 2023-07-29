@@ -53,7 +53,7 @@ while loop (status of any agent has not found target)
 
 ## Work Distribution:
 1. Planning -- Harsh, Reuben
-2. Environment Setup -- Vrishin, Reuben
+2. Environment Setup -- Vrishin, Reuben, Harsh
 3. Agent Implementation
     a. 0 -- 2 Harsh, Reuben
     b. 3 -- 4 Harsh, Reuben
@@ -63,5 +63,5 @@ while loop (status of any agent has not found target)
     - Gray boxes -- Reuben
     - Modeling and updating belief state mechanism (with probability) -- Harsh, Reuben, Vrishin
     - Implementation details of agents -- We write up our own implementation of agents
-    - Data performance (Running and analyzing tests on a lot of random envs) -- Harsh, Reuben
+    - Data performance (Running and analyzing tests on a lot of random envs) -- Reuben
     - Reflection/Concluding Questions -- Vrishin
