@@ -12,8 +12,8 @@ class Agent_0:
         return self.location
 class Agent_1:
     def __init__(self):
-        # self.location = random.randint(0, 39)
-        self.location = 0
+        self.location = random.randint(0, 39)
+        # self.location = 0
 
     def move_agent(self, graph_dict, target):
         shortest_path = self.dijkstra(graph_dict, self.location, target)
@@ -55,25 +55,27 @@ class Agent_1:
 
 class Agent_2:
     def __init__(self):
-        # self.location = random.randint(0, 39)
-        self.location = 0
+        self.location = random.randint(0, 39)
+        # self.location = 0
 
     def move_agent(self, graph_dict, target):
         if target in graph_dict[self.location]:
-            self.location = target
-        else:
-            potential_target_locations = graph_dict[target]
-            shortest_paths = [(self.dijkstra(graph_dict, self.location, potential_location), potential_location) for potential_location in potential_target_locations]
-            # Filter out None paths (unreachable nodes)
-            shortest_paths = [path for path in shortest_paths if path[0]]
-            if not shortest_paths:
-                print("No accessible paths...")
-                return
-            # Selects the shortest path among the potential target's next locations
-            shortest_path_to_potential_location = min(shortest_paths, key=lambda x: len(x[0]))
-            # Moves agent 1 step on the chosen path
-            self.location = shortest_path_to_potential_location[0][1] if len(shortest_path_to_potential_location[0]) > 1 else shortest_path_to_potential_location[0][0]
+            return self.location
+        potential_target_locations = graph_dict[target]
+        potential_target_locations.append(target)
+        all_paths = []
+        for i in range(0, len(potential_target_locations)):
+            path = self.dijkstra(graph_dict, self.location, potential_target_locations[i])
+            if path is not None:
+                all_paths.append(path)
 
+        sorted_paths = sorted(all_paths, key=len)
+        if sorted_paths is None:
+            print("You have made a grave error...")
+            return
+        selected_path = sorted_paths[0]
+        self.location = selected_path[1] if len(selected_path) > 1 else selected_path[0]
+        return
 
     def dijkstra(self, graph_dict, start, end):
         # Dijkstra's algorithm.
@@ -101,7 +103,6 @@ class Agent_2:
             path.append(cursor)
             cursor = predecessors[cursor]
         return list(reversed(path))
-
 class Agent_3:
     def __init__(self):
         self.location = random.randint(0, 39)
@@ -152,32 +153,40 @@ class Graph:
         while not all (not element for element in self.agents_active):
             self.turn()
             self.move_target()
+            print(self.time_step)
         print(self.agent_performance)
 
     def turn(self):
         self.time_step += 1
         for i in range(0, 7):
             if self.agents_active[i]:
+                # if self.is_target_captured(self.agent_locations[i], i):
+                #     continue
                 self.agents[i].move_agent(self.graph_dict, self.target)
                 self.agent_locations[i] = self.agents[i].location
                 self.is_target_captured(self.agent_locations[i], i)
-        self.draw_graph() # draw the graph at each time step
-        plt.pause(0.1) # add a pause so you can see the graphs
+        # self.draw_graph() # draw the graph at each time step
+        # plt.pause(0.1) # add a pause so you can see the graphs
 
     def is_target_captured(self, agent_location, agent_index):
         if(agent_location == self.target):
             self.agent_performance[agent_index] = self.time_step
             self.agents_active[agent_index] = False
+            print(f"Agent {agent_index} has captured the target")
+            print(self.agent_performance)
+        #     return True
+        # return False
 
     def initialize_agents(self):        
         self.agents = [Agent_0(), Agent_1(), Agent_2(), Agent_3(), Agent_4(), Agent_5(), Agent_6(), Agent_7()]
         self.agent_locations = [self.agents[i].location for i in range(0, 7)]
         # self.agents_active = [True for i in range(0, 7)]
-        self.agents_active = [False, True, True, False, False, False, False, False]
+        self.agents_active = [True, True, True, False, False, False, False, False]
         self.agents_colors = ["magenta","green","pink","yellow","gray","white","cyan","purple"]
         self.agent_performance = [-1 for i in range(0, 7)]
         for i in range(0, 7):
-            self.is_target_captured(self.agent_locations[i], i)
+            if self.agents_active[i]:
+                self.is_target_captured(self.agent_locations[i], i)
 
     def set_target_location(self):
         location = random.randint(0, 39)
@@ -221,7 +230,7 @@ if __name__ == "__main__":
         loaded_graphs_envs = pickle.load(f)
     example = loaded_graphs_envs[6]
     example.print_graph_dict()
-    example.draw_graph()
+    # example.draw_graph()
     example.run_agents()
     
     
