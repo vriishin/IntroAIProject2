@@ -163,35 +163,8 @@ class Agent_6(Agent):
         #print("Knowledge Base:")
         #for node, prob in self.probabilistic_kb.items():
             #print(f"Node {node}: {prob}")
-
-    def djikstra(self, graph_dict, start, end):
-        # djikstra's algorithm.
-        heap = [(0, start)]
-        predecessors = {start: None}
-        distances = {start: 0}
-
-        while heap:
-            (distance, current) = heapq.heappop(heap)
-            if current == end:
-                return self.path(predecessors, end)
-            for neighbor in graph_dict[current]:
-                old_distance = distances.get(neighbor, float('inf'))
-                new_distance = distances[current] + 1
-                if new_distance < old_distance:
-                    distances[neighbor] = new_distance
-                    predecessors[neighbor] = current
-                    heapq.heappush(heap, (new_distance, neighbor))
-
-    @staticmethod
-    def path(predecessors, end):
-        cursor = end
-        path = []
-        while cursor is not None:
-            path.append(cursor)
-            cursor = predecessors[cursor]
-        return list(reversed(path))
-
 class Agent_7(Agent):
+
     def __init__(self):
         self.location = random.randint(0, 39)
 
