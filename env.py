@@ -3,31 +3,12 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import random
 import pickle
+from abc import ABC, abstractmethod
 
-class Agent_0:
-    def __init__(self):
-        self.location = random.randint(0, 39)
-    
-    def move_agent(self, graph_dict, target):
-        return self.location
-class Agent_1:
-    def __init__(self):
-        self.location = random.randint(0, 39)
-        # self.location = 0
+class Agent(ABC):
 
-    def move_agent(self, graph_dict, target):
-        shortest_path = self.dijkstra(graph_dict, self.location, target)
-
-        # If there are no paths (agent and target are in disconnected subgraphs), don't move.
-        if not shortest_path:
-            print("You have made a grave error...")
-            return
-
-        # Moves agent 1 step on the shortest path
-        self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
-
-    def dijkstra(self, graph_dict, start, end):
-        # Dijkstra's algorithm.
+    def djikstra(self, graph_dict, start, end):
+        # djikstra's algorithm.
         heap = [(0, start)]
         predecessors = {start: None}
         distances = {start: 0}
@@ -52,8 +33,57 @@ class Agent_1:
             path.append(cursor)
             cursor = predecessors[cursor]
         return list(reversed(path))
+    
 
-class Agent_2:
+    def update_probabilistic_kb(self, examined_node, graph_dict, target):
+        target_found = True if examined_node == target else False
+        if target_found:
+            self.probabilistic_kb[examined_node] = 1
+        else:
+            self.probabilistic_kb[examined_node] = 0
+
+
+        for node in graph_dict:
+            if self.num_neighbors[node] > 0:
+                k = self.num_neighbors[node]
+                p_move_to_neighbor = 1 / k
+                for neighbor in graph_dict[node]:
+                    self.probabilistic_kb[neighbor] += p_move_to_neighbor
+                self.probabilistic_kb[node] -= 1
+
+        # Normalize the probabilities to maintain the sum equal to 1.
+        total_probability = sum(self.probabilistic_kb.values())
+        for node in self.probabilistic_kb:
+            self.probabilistic_kb[node] /= total_probability
+    
+
+    
+
+class Agent_0(Agent):
+    def __init__(self):
+        self.location = random.randint(0, 39)
+    
+    def move_agent(self, graph_dict, target):
+        return self.location
+    
+
+class Agent_1(Agent):
+    def __init__(self):
+        self.location = random.randint(0, 39)
+        # self.location = 0
+ 
+    def move_agent(self, graph_dict, target):
+        shortest_path = self.djikstra(graph_dict, self.location, target)
+
+        # If there are no paths (agent and target are in disconnected subgraphs), don't move.
+        if not shortest_path:
+            print("You have made a grave error...")
+            return
+
+        # Moves agent 1 step on the shortest path
+        self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
+
+class Agent_2(Agent):
     def __init__(self):
         self.location = random.randint(0, 39)
         # self.location = 0
@@ -65,7 +95,7 @@ class Agent_2:
         potential_target_locations.append(target)
         all_paths = []
         for i in range(0, len(potential_target_locations)):
-            path = self.dijkstra(graph_dict, self.location, potential_target_locations[i])
+            path = self.djikstra(graph_dict, self.location, potential_target_locations[i])
             if path is not None:
                 all_paths.append(path)
 
@@ -77,65 +107,19 @@ class Agent_2:
         self.location = selected_path[1] if len(selected_path) > 1 else selected_path[0]
         return
 
-    def dijkstra(self, graph_dict, start, end):
-        # Dijkstra's algorithm.
-        heap = [(0, start)]
-        predecessors = {start: None}
-        distances = {start: 0}
-
-        while heap:
-            (distance, current) = heapq.heappop(heap)
-            if current == end:
-                return self.path(predecessors, end)
-            for neighbor in graph_dict[current]:
-                old_distance = distances.get(neighbor, float('inf'))
-                new_distance = distances[current] + 1
-                if new_distance < old_distance:
-                    distances[neighbor] = new_distance
-                    predecessors[neighbor] = current
-                    heapq.heappush(heap, (new_distance, neighbor))
-
-    @staticmethod
-    def path(predecessors, end):
-        cursor = end
-        path = []
-        while cursor is not None:
-            path.append(cursor)
-            cursor = predecessors[cursor]
-        return list(reversed(path))
-class Agent_3:
+class Agent_3(Agent):
     def __init__(self):
         self.location = random.randint(0, 39)
 
     def move_agent(self, graph_dict, target):
         return self.location
-class Agent_4:
+    
+class Agent_4(Agent):
     def __init__(self, graph_dict):
         total_nodes = 40
         self.location = random.randint(0, 39)
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
-
-    def update_probabilistic_kb(self, examined_node, graph_dict, target):
-        target_found = True if examined_node == target else False
-        if target_found:
-            self.probabilistic_kb[examined_node] = 1
-        else:
-            self.probabilistic_kb[examined_node] = 0
-
-
-        for node in graph_dict:
-            if self.num_neighbors[node] > 0:
-                k = self.num_neighbors[node]
-                p_move_to_neighbor = 1 / k
-                for neighbor in graph_dict[node]:
-                    self.probabilistic_kb[neighbor] += p_move_to_neighbor
-                self.probabilistic_kb[node] -= 1
-
-        # Normalize the probabilities to maintain the sum equal to 1.
-        total_probability = sum(self.probabilistic_kb.values())
-        for node in self.probabilistic_kb:
-            self.probabilistic_kb[node] /= total_probability
 
     def move_agent(self, graph_dict, target):
 
@@ -144,66 +128,44 @@ class Agent_4:
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
-        # print("Knowledge Base:")
-        # for node, prob in self.probabilistic_kb.items():
-        #     print(f"Node {node}: {prob}")
+        #print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
+        #print("Knowledge Base:")
+        #for node, prob in self.probabilistic_kb.items():
+            #print(f"Node {node}: {prob}")
 
-class Agent_5:
+class Agent_5(Agent):
     def __init__(self):
         self.location = random.randint(0, 39)
 
     def move_agent(self, graph_dict, target):
         pass
 
-class Agent_6:
+class Agent_6(Agent):
     def __init__(self, graph_dict):
         # self.location = random.randint(0, 39)
         total_nodes = 40
         self.location = random.randint(0, 39)
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
-
-    def update_probabilistic_kb(self, examined_node, graph_dict, target):
-        target_found = True if examined_node == target else False
-        if target_found:
-            self.probabilistic_kb[examined_node] = 1
-        else:
-            self.probabilistic_kb[examined_node] = 0
-
-
-        for node in graph_dict:
-            if self.num_neighbors[node] > 0:
-                k = self.num_neighbors[node]
-                p_move_to_neighbor = 1 / k
-                for neighbor in graph_dict[node]:
-                    self.probabilistic_kb[neighbor] += p_move_to_neighbor
-                self.probabilistic_kb[node] -= 1
-
-        # Normalize the probabilities to maintain the sum equal to 1.
-        total_probability = sum(self.probabilistic_kb.values())
-        for node in self.probabilistic_kb:
-            self.probabilistic_kb[node] /= total_probability
-
     def move_agent(self, graph_dict, target):
 
         highest_prob_nodes = [node for node, prob in self.probabilistic_kb.items() if prob == max(self.probabilistic_kb.values())]
 
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
-        shortest_path = self.dijkstra(graph_dict, self.location, next_location)
+        shortest_path = self.djikstra(graph_dict, self.location, next_location)
         if not shortest_path:
             print("You have made a grave error...")
             return
 
         self.location = shortest_path[1] if len(shortest_path) > 1 else shortest_path[0]
-        print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
-        print("Knowledge Base:")
-        for node, prob in self.probabilistic_kb.items():
-            print(f"Node {node}: {prob}")
+        #print(f"AGENT 6 LOC: {self.location},\n TARGET LOCATION: {target}")
+        #print("Knowledge Base:")
+        #for node, prob in self.probabilistic_kb.items():
+            #print(f"Node {node}: {prob}")
 
-    def dijkstra(self, graph_dict, start, end):
-        # Dijkstra's algorithm.
+    def djikstra(self, graph_dict, start, end):
+        # djikstra's algorithm.
         heap = [(0, start)]
         predecessors = {start: None}
         distances = {start: 0}
@@ -229,7 +191,7 @@ class Agent_6:
             cursor = predecessors[cursor]
         return list(reversed(path))
 
-class Agent_7:
+class Agent_7(Agent):
     def __init__(self):
         self.location = random.randint(0, 39)
 
@@ -264,8 +226,8 @@ class Graph:
                 self.agents[i].move_agent(self.graph_dict, self.target)
                 self.agent_locations[i] = self.agents[i].location
                 self.is_target_captured(self.agent_locations[i], i)
-        self.draw_graph() # draw the graph at each time step
-        plt.pause(0.1) # add a pause so you can see the graphs
+        #self.draw_graph() # draw the graph at each time step
+        #plt.pause(0.1) # add a pause so you can see the graphs
 
     def is_target_captured(self, agent_location, agent_index):
         if(agent_location == self.target):
@@ -279,7 +241,7 @@ class Graph:
     def initialize_agents(self):        
         self.agents = [Agent_0(), Agent_1(), Agent_2(), Agent_3(), Agent_4(self.graph_dict), Agent_5(), Agent_6(self.graph_dict), Agent_7()]
         self.agent_locations = [self.agents[i].location for i in range(0, 8)]
-        # self.agents_active = [True for i in range(0, 7)]
+        # self.agents_active = [True for i in range(0, 8)]
         self.agents_active = [True, True, True, True, True, False, True, False]
         self.agents_colors = ["magenta","green","pink","yellow","gray","white","cyan","purple"]
         self.agent_performance = [-1 for i in range(0, 8)]
