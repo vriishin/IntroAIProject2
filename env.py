@@ -131,7 +131,7 @@ class Agent_4(Agent):
         next_location = random.choice(highest_prob_nodes)
         self.update_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        # print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
+        print(f"AGENT 4 LOC: {self.location},\n TARGET LOCATION: {target}")
         #print("Knowledge Base:")
         #for node, prob in self.probabilistic_kb.items():
             #print(f"Node {node}: {prob}")
@@ -143,41 +143,32 @@ class Agent_5(Agent):
         # self.location = 0   
         self.probabilistic_kb = {node: 1/total_nodes for node in range(total_nodes)}
         self.num_neighbors = {node: len(neighbors) for node, neighbors in graph_dict.items()}
-    
-    def modified_probabilistic_kb(self, examined_node, graph_dict, target):
-        target_found = True if examined_node == target else False
-        if target_found:
-            self.probabilistic_kb[examined_node] = 1
-        else:
-            self.probabilistic_kb[examined_node] = 0
-
-        for node in graph_dict:
-            if self.num_neighbors[node] > 0:
-                k = self.num_neighbors[node]
-                p_move_to_neighbor = 1 / k
-                for neighbor in graph_dict[node]:
-                    self.probabilistic_kb[neighbor] += p_move_to_neighbor
-                    if self.num_neighbors[neighbor] > 0:
-                        k_neighbor = self.num_neighbors[neighbor]
-                        p_move_to_next_neighbor = p_move_to_neighbor / k_neighbor
-                        for neighbor_neighbor in graph_dict[neighbor]:
-                            self.probabilistic_kb[neighbor_neighbor] += p_move_to_next_neighbor
-                    self.probabilistic_kb[node] -= 1
-
-        total_probability = sum(self.probabilistic_kb.values())
-        for node in self.probabilistic_kb:
-            self.probabilistic_kb[node] /= total_probability
+        self.visited_dict = dict()
 
     def move_agent(self, graph_dict, target):
-        pass
+       # Create a copy of the probabilistic_kb dictionary
         highest_prob_nodes = [node for node, prob in self.probabilistic_kb.items() if prob == max(self.probabilistic_kb.values())]
-        next_location = random.choice(highest_prob_nodes)
-        self.modified_probabilistic_kb(next_location, graph_dict, target)
+
+        next_location = self.choose_from_highest_prob(highest_prob_nodes)
+        self.update_probabilistic_kb(next_location, graph_dict, target)
         self.location = next_location
-        # print(f"AGENT 5 LOC: {self.location},\n TARGET LOCATION: {target}")
-        # print("Knowledge Base:")
-        # for node, prob in self.probabilistic_kb.items():
-        #     print(f"Node {node}: {prob}")
+        print(f"AGENT 5 LOC: {self.location},\n TARGET LOCATION: {target}")
+        #print("Knowledge Base:")
+        #for node, prob in self.probabilistic_kb.items():
+            #print(f"Node {node}: {prob}")
+
+    def choose_from_highest_prob(self, highest_prob_node_list):
+        lowest_count = 1000
+        best_node = 0
+        for n in highest_prob_node_list:
+            if n not in self.visited_dict:
+                return n
+            
+            if self.visited_dict[n] <= lowest_count:
+                lowest_count = self.visited_dict[n]
+                best_node = n
+        return best_node
+
 
 
 class Agent_6(Agent):
