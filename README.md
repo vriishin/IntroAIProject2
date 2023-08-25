@@ -36,6 +36,7 @@ Moves randomly through the environment and the agents have to capture this targe
 
 ## Performance Analysis
 The agent performance was tracked by identifying the number of moves it took to capture the target.
+![image](https://github.com/vriishin/IntroAIProject2/assets/91761998/bb94cc20-38db-475d-ad8c-29d2ec50b865)
 
 
 ## Authors
